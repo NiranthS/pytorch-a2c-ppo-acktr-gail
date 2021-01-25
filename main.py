@@ -3,13 +3,16 @@ import glob
 import os
 import time
 from collections import deque
-
+import sprites_env
 import gym
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+import sys
+import h5py
+sys.path.append('/home/niranth/Desktop/Work/USC_Task/USC_task')
 
 from a2c_ppo_acktr import algo, utils
 from a2c_ppo_acktr.algo import gail
@@ -18,6 +21,7 @@ from a2c_ppo_acktr.envs import make_vec_envs
 from a2c_ppo_acktr.model import Policy
 from a2c_ppo_acktr.storage import RolloutStorage
 from evaluation import evaluate
+import matplotlib.pyplot as plt
 
 
 def main():
@@ -34,13 +38,14 @@ def main():
     eval_log_dir = log_dir + "_eval"
     utils.cleanup_log_dir(log_dir)
     utils.cleanup_log_dir(eval_log_dir)
+    # import pdb; pdb.set_trace()
 
     torch.set_num_threads(1)
     device = torch.device("cuda:0" if args.cuda else "cpu")
 
     envs = make_vec_envs(args.env_name, args.seed, args.num_processes,
                          args.gamma, args.log_dir, device, False)
-
+    # import pdb; pdb.set_trace()
     actor_critic = Policy(
         envs.observation_space.shape,
         envs.action_space,
@@ -100,6 +105,10 @@ def main():
     episode_rewards = deque(maxlen=10)
 
     start = time.time()
+    rewards_mean = []
+    rewards_median = []
+    val_loss = []
+    act_loss = []
     num_updates = int(
         args.num_env_steps) // args.num_steps // args.num_processes
     for j in range(num_updates):
@@ -186,6 +195,22 @@ def main():
                         np.median(episode_rewards), np.min(episode_rewards),
                         np.max(episode_rewards), dist_entropy, value_loss,
                         action_loss))
+            rewards_mean.append(np.mean(episode_rewards))
+            rewards_median.append(np.median(episode_rewards))
+            val_loss.append(value_loss)
+            act_loss.append(action_loss)
+            torch.save(rewards_mean, "./plot_data/"+args.env_name+"_avg_rewards.pt")
+            torch.save(rewards_median, "./plot_data/"+args.env_name+"_median_rewards.pt")
+            torch.save(val_loss, "./plot_data/"+args.env_name+"_val_loss.pt")
+            torch.save(act_loss, "./plot_data/"+args.env_name+"_act_loss.pt")
+
+            plt.plot(rewards_mean)
+            # print(plt_points2)
+            plt.savefig("./imgs/"+args.env_name+"avg_reward.png")
+            plt.show(block = False)
+
+
+
 
         if (args.eval_interval is not None and len(episode_rewards) > 1
                 and j % args.eval_interval == 0):
