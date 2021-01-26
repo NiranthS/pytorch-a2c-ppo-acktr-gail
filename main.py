@@ -51,6 +51,8 @@ def main():
         envs.observation_space.shape,
         envs.action_space,
         base_kwargs={'recurrent': args.recurrent_policy})
+    # print(args.re)
+    import pdb; pdb.set_trace()
     actor_critic.to(device)
 
     if args.algo == 'a2c':
