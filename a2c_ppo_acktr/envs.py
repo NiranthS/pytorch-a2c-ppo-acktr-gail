@@ -61,17 +61,21 @@ def make_env(env_id, seed, rank, log_dir, allow_early_resets):
                 env = WarpFrame(env, width=84, height=84)
                 env = ClipRewardEnv(env)
         elif len(env.observation_space.shape) == 3:
-            raise NotImplementedError(
-                "CNN models work only for atari,\n"
-                "please use a custom wrapper for a custom pixel input env.\n"
-                "See wrap_deepmind for an example.")
+            # env = EpisodicLifeEnv(env)
+            # if 'FIRE' in env.unwrapped.get_action_meanings():
+            #     env = FireResetEnv(env)
+            env = WarpFrame(env, width=64, height=64)
+
+            # raise NotImplementedError(
+            #     "CNN models work only for atari,\n"
+            #     "please use a custom wrapper for a custom pixel input env.\n"
+            #     "See wrap_deepmind for an example.")
 
         # If the input has shape (W,H,3), wrap for PyTorch convolutions
         obs_shape = env.observation_space.shape
         if len(obs_shape) == 3 and obs_shape[2] in [1, 3]:
             env = TransposeImage(env, op=[2, 0, 1])
 
-        # import pdb; pdb.set_trace()
         return env
 
     return _thunk
@@ -243,6 +247,7 @@ class VecPyTorchFrameStack(VecEnvWrapper):
         return self.stacked_obs, rews, news, infos
 
     def reset(self):
+        import pdb; pdb.set_trace()
         obs = self.venv.reset()
         if torch.backends.cudnn.deterministic:
             self.stacked_obs = torch.zeros(self.stacked_obs.shape)

@@ -18,14 +18,14 @@ class Policy(nn.Module):
         if base_kwargs is None:
             base_kwargs = {}
         if base is None:
-            if len(obs_shape) == 3:
+            if len(obs_shape) > 1:
                 base = CNNBase
             elif len(obs_shape) == 1:
                 base = MLPBase
-            else:
-                raise NotImplementedError
+            # else:
+            #     raise NotImplementedError
 
-        self.base = base(obs_shape[0], **base_kwargs)
+        self.base = base( 1 , **base_kwargs)
 
         if action_space.__class__.__name__ == "Discrete":
             num_outputs = action_space.n
@@ -167,30 +167,50 @@ class NNBase(nn.Module):
 
 
 class CNNBase(NNBase):
-    def __init__(self, num_inputs, recurrent=False, hidden_size=512):
-        super(CNNBase, self).__init__(recurrent, hidden_size, hidden_size)
+    def __init__(self, num_inputs, recurrent=False, hidden_size=64):
+        super(CNNBase, self).__init__(num_inputs, recurrent, hidden_size)
 
-        init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
-                               constant_(x, 0), nn.init.calculate_gain('relu'))
+        # init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
+        #                        constant_(x, 0), nn.init.calculate_gain('relu'))
 
-        self.main = nn.Sequential(
-            init_(nn.Conv2d(num_inputs, 32, 8, stride=4)), nn.ReLU(),
-            init_(nn.Conv2d(32, 64, 4, stride=2)), nn.ReLU(),
-            init_(nn.Conv2d(64, 32, 3, stride=1)), nn.ReLU(), Flatten(),
-            init_(nn.Linear(32 * 7 * 7, hidden_size)), nn.ReLU())
+        # self.main = nn.Sequential(
+        self.conv1 = nn.Conv2d(1, 4, 2, 2)
+        #   = nn.BatchNorm2d(4)
+        self.conv2 = nn.Conv2d(4, 8, 2, 2)
+        #   = nn.BatchNorm2d(8)
+        self.conv3 = nn.Conv2d(8, 16, 2, 2)
+        #   = nn.BatchNorm2d(16)
+        self.conv4 = nn.Conv2d(16, 32, 2, 2)
+        #   = nn.BatchNorm2d(32)
+        self.conv5 = nn.Conv2d(32, 64, 2, 2)
+        #   = nn.BatchNorm2d(64)
+        self.conv6 = nn.Conv2d(64, 128, 2, 2)
+        #   = nn.BatchNorm2d(128)
+        self.conv7 = nn.Conv2d(128, 256, 2, 2)
+        #   = nn.BatchNorm2d(256)
+        self.enc_dense = nn.Linear(256, 64)
 
-        init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
-                               constant_(x, 0))
+        # init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
+        #                        constant_(x, 0))
 
-        self.critic_linear = init_(nn.Linear(hidden_size, 1))
+        self.critic_linear = (nn.Linear(64, 1))
 
         self.train()
 
     def forward(self, inputs, rnn_hxs, masks):
-        x = self.main(inputs / 255.0)
-
-        if self.is_recurrent:
-            x, rnn_hxs = self._forward_gru(x, rnn_hxs, masks)
+        # import pdb; pdb.set_trace()
+        # x = self.main(torch.unsqueeze(inputs,1))
+        x =  (F.relu(self.conv1(torch.unsqueeze(inputs,1))))
+        x =  (F.relu(self.conv2(x)))
+        x =  (F.relu(self.conv3(x)))
+        x =  (F.relu(self.conv4(x)))
+        x =  (F.relu(self.conv5(x)))
+        x =  (F.relu(self.conv6(x)))
+        x = (F.relu(self.conv7(x)))
+        x = x.view(-1, 256)
+        x = F.relu(self.enc_dense(x))
+        # if self.is_recurrent:
+        #     x, rnn_hxs = self._forward_gru(x, rnn_hxs, masks)
 
         return self.critic_linear(x), x, rnn_hxs
 
