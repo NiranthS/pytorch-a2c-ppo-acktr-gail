@@ -183,7 +183,7 @@ def main():
             torch.save([
                 actor_critic,
                 getattr(utils.get_vec_normalize(envs), 'ob_rms', None)
-            ], os.path.join(save_path, args.env_name + ".pt"))
+            ], os.path.join(save_path, args.env_name + "_enc.pt"))
 
         if j % args.log_interval == 0 and len(episode_rewards) > 1:
             total_num_steps = (j + 1) * args.num_processes * args.num_steps
@@ -200,14 +200,14 @@ def main():
             rewards_median.append(np.median(episode_rewards))
             val_loss.append(value_loss)
             act_loss.append(action_loss)
-            torch.save(rewards_mean, "./plot_data/"+args.env_name+"_avg_rewards.pt")
-            torch.save(rewards_median, "./plot_data/"+args.env_name+"_median_rewards.pt")
-            torch.save(val_loss, "./plot_data/"+args.env_name+"_val_loss.pt")
-            torch.save(act_loss, "./plot_data/"+args.env_name+"_act_loss.pt")
+            torch.save(rewards_mean, "./plot_data/"+args.env_name+"_avg_rewards_enc.pt")
+            torch.save(rewards_median, "./plot_data/"+args.env_name+"_median_rewards_enc.pt")
+            torch.save(val_loss, "./plot_data/"+args.env_name+"_val_loss_enc.pt")
+            torch.save(act_loss, "./plot_data/"+args.env_name+"_act_loss_enc.pt")
 
             plt.plot(rewards_mean)
             # print(plt_points2)
-            plt.savefig("./imgs/"+args.env_name+"avg_reward.png")
+            plt.savefig("./imgs/"+args.env_name+"avg_reward_enc.png")
             plt.show(block = False)
 
 
