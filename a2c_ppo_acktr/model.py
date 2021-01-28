@@ -26,6 +26,8 @@ class Policy(nn.Module):
             #     raise NotImplementedError
 
         self.base = base( 1 , **base_kwargs)
+        
+        # import pdb; pdb.set_trace()
 
         if action_space.__class__.__name__ == "Discrete":
             num_outputs = action_space.n
@@ -54,7 +56,7 @@ class Policy(nn.Module):
     def act(self, inputs, rnn_hxs, masks, deterministic=False):
         value, actor_features, rnn_hxs = self.base(inputs, rnn_hxs, masks)
         dist = self.dist(actor_features)
-
+        # import pdb; pdb.set_trace()
         if deterministic:
             action = dist.mode()
         else:
@@ -167,7 +169,7 @@ class NNBase(nn.Module):
 
 
 class CNNBase(NNBase):
-    def __init__(self, num_inputs, recurrent=False, hidden_size=64):
+    def __init__(self, num_inputs, recurrent=False, hidden_size= 32):
         super(CNNBase, self).__init__(num_inputs, recurrent, hidden_size)
 
         # init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
@@ -190,10 +192,15 @@ class CNNBase(NNBase):
         #   = nn.BatchNorm2d(256)
         self.enc_dense = nn.Linear(256, 64)
 
+        self.actor_1 = nn.Linear(64, 32)
+        self.actor_2 = nn.Linear(32, 32)
+
         # init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
         #                        constant_(x, 0))
 
-        self.critic_linear = (nn.Linear(64, 1))
+        self.critic_linear1 = (nn.Linear(64, 32))
+        self.critic_linear2 = nn.Linear(32,32)
+        self.critic_linear3 = nn.Linear(32,1)
 
         self.train()
 
@@ -209,10 +216,15 @@ class CNNBase(NNBase):
         x = (F.relu(self.conv7(x)))
         x = x.view(-1, 256)
         x = F.relu(self.enc_dense(x))
+        a = F.relu(self.actor_1(x))
+        a = F.relu(self.actor_2(a))
         # if self.is_recurrent:
         #     x, rnn_hxs = self._forward_gru(x, rnn_hxs, masks)
+        critic = F.relu(self.critic_linear1(x))
+        critic = F.relu(self.critic_linear2(critic))
+        critic = self.critic_linear3(critic)
 
-        return self.critic_linear(x), x, rnn_hxs
+        return critic, a, rnn_hxs
 
 
 class MLPBase(NNBase):
