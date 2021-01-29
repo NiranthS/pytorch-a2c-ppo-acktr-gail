@@ -172,59 +172,85 @@ class CNNBase(NNBase):
     def __init__(self, num_inputs, recurrent=False, hidden_size= 32):
         super(CNNBase, self).__init__(num_inputs, recurrent, hidden_size)
 
+        init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
+                               constant_(x, 0), nn.init.calculate_gain('relu'))
         # init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
-        #                        constant_(x, 0), nn.init.calculate_gain('relu'))
+        #                        constant_(x, 0), np.sqrt(2))
+
+        self.enc = nn.Sequential(
+            init_(nn.Conv2d(1, 4, 2, 2)), nn.ReLU(),
+            init_(nn.Conv2d(4, 8, 2, 2)), nn.ReLU(),
+            init_(nn.Conv2d(8, 16, 2, 2)), nn.ReLU(),
+            init_(nn.Conv2d(16, 32, 2, 2)), nn.ReLU(),
+            init_(nn.Conv2d(32, 64, 2, 2)), nn.ReLU(),
+            init_(nn.Conv2d(64, 128, 2, 2)), nn.ReLU(),
+            init_(nn.Conv2d(128, 256, 2, 2)), nn.ReLU(), Flatten(),
+            init_(nn.Linear(256, 64)), nn.ReLU())
+
+        self.actor = nn.Sequential(
+            init_(nn.Linear(64, 32)), nn.Tanh(),
+            init_(nn.Linear(32, 32)), nn.Tanh()
+        )
+
+        self.critic = nn.Sequential(
+            init_(nn.Linear(64, 32)), nn.Tanh(),
+            init_(nn.Linear(32, 32)), nn.Tanh())
+
+        self.critic_linear = init_(nn.Linear(32, 1))
 
         # self.main = nn.Sequential(
-        self.conv1 = nn.Conv2d(1, 4, 2, 2)
-        #   = nn.BatchNorm2d(4)
-        self.conv2 = nn.Conv2d(4, 8, 2, 2)
-        #   = nn.BatchNorm2d(8)
-        self.conv3 = nn.Conv2d(8, 16, 2, 2)
-        #   = nn.BatchNorm2d(16)
-        self.conv4 = nn.Conv2d(16, 32, 2, 2)
-        #   = nn.BatchNorm2d(32)
-        self.conv5 = nn.Conv2d(32, 64, 2, 2)
-        #   = nn.BatchNorm2d(64)
-        self.conv6 = nn.Conv2d(64, 128, 2, 2)
-        #   = nn.BatchNorm2d(128)
-        self.conv7 = nn.Conv2d(128, 256, 2, 2)
-        #   = nn.BatchNorm2d(256)
-        self.enc_dense = nn.Linear(256, 64)
+        # self.conv1 = nn.Conv2d(1, 4, 2, 2)
+        # #   = nn.BatchNorm2d(4)
+        # self.conv2 = nn.Conv2d(4, 8, 2, 2)
+        # #   = nn.BatchNorm2d(8)
+        # self.conv3 = nn.Conv2d(8, 16, 2, 2)
+        # #   = nn.BatchNorm2d(16)
+        # self.conv4 = nn.Conv2d(16, 32, 2, 2)
+        # #   = nn.BatchNorm2d(32)
+        # self.conv5 = nn.Conv2d(32, 64, 2, 2)
+        # #   = nn.BatchNorm2d(64)
+        # self.conv6 = nn.Conv2d(64, 128, 2, 2)
+        # #   = nn.BatchNorm2d(128)
+        # self.conv7 = nn.Conv2d(128, 256, 2, 2)
+        # #   = nn.BatchNorm2d(256)
+        # self.enc_dense = nn.Linear(256, 64)
 
-        self.actor_1 = nn.Linear(64, 32)
-        self.actor_2 = nn.Linear(32, 32)
+        # self.actor_1 = nn.Linear(64, 32)
+        # self.actor_2 = nn.Linear(32, 32)
 
         # init_ = lambda m: init(m, nn.init.orthogonal_, lambda x: nn.init.
         #                        constant_(x, 0))
 
-        self.critic_linear1 = (nn.Linear(64, 32))
-        self.critic_linear2 = nn.Linear(32,32)
-        self.critic_linear3 = nn.Linear(32,1)
+        # self.critic_linear1 = (nn.Linear(64, 32))
+        # self.critic_linear2 = nn.Linear(32,32)
+        # self.critic_linear3 = nn.Linear(32,1)
 
         self.train()
 
     def forward(self, inputs, rnn_hxs, masks):
         # import pdb; pdb.set_trace()
-        # x = self.main(torch.unsqueeze(inputs,1))
-        x =  (F.relu(self.conv1(torch.unsqueeze(inputs,1))))
-        x =  (F.relu(self.conv2(x)))
-        x =  (F.relu(self.conv3(x)))
-        x =  (F.relu(self.conv4(x)))
-        x =  (F.relu(self.conv5(x)))
-        x =  (F.relu(self.conv6(x)))
-        x = (F.relu(self.conv7(x)))
-        x = x.view(-1, 256)
-        x = F.relu(self.enc_dense(x))
-        a = F.relu(self.actor_1(x))
-        a = F.relu(self.actor_2(a))
-        # if self.is_recurrent:
-        #     x, rnn_hxs = self._forward_gru(x, rnn_hxs, masks)
-        critic = F.relu(self.critic_linear1(x))
-        critic = F.relu(self.critic_linear2(critic))
-        critic = self.critic_linear3(critic)
+        x = self.enc(torch.unsqueeze(inputs,1))
+        # x =  (F.relu(self.conv1(torch.unsqueeze(inputs,1))))
+        # x =  (F.relu(self.conv2(x)))
+        # x =  (F.relu(self.conv3(x)))
+        # x =  (F.relu(self.conv4(x)))
+        # x =  (F.relu(self.conv5(x)))
+        # x =  (F.relu(self.conv6(x)))
+        # x = (F.relu(self.conv7(x)))
+        # x = x.view(-1, 256)
+        # x = F.relu(self.enc_dense(x))
+        # a = F.relu(self.actor_1(x))
+        # a = F.relu(self.actor_2(a))
+        # # if self.is_recurrent:
+        # #     x, rnn_hxs = self._forward_gru(x, rnn_hxs, masks)
+        # critic = F.relu(self.critic_linear1(x))
+        # critic = F.relu(self.critic_linear2(critic))
+        # critic = self.critic_linear3(critic)
+        actr = self.actor(x)
+        critic = self.critic(x)
 
-        return critic, a, rnn_hxs
+
+        return self.critic_linear(critic), actr, rnn_hxs
 
 
 class MLPBase(NNBase):
