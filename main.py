@@ -68,6 +68,19 @@ def main():
         if layer_name == 'enc_dense.bias':
             break
 
+    actor_critic.load_state_dict(my_model_state_dict)
+
+    ka = 0
+
+    for param in actor_critic.parameters():
+        ka += 1
+        # import pdb; pdb.set_trace()
+        param.requires_grad = False
+        if ka == 16:
+            break
+    count = 0
+    # import pdb; pdb.set_trace()
+
     
 
     actor_critic.to(device)
