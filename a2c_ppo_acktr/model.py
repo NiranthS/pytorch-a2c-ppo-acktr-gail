@@ -184,7 +184,7 @@ class CNNBase(NNBase):
             init_(nn.Conv2d(16, 32, 2, 2)), nn.ReLU(),
             init_(nn.Conv2d(32, 64, 2, 2)), nn.ReLU(),
             # init_(nn.Conv2d(64, 128, 2, 2)), nn.ReLU(),
-            init_(nn.Conv2d(64, 128, 2)), nn.ReLU(), Flatten(),
+            init_(nn.Conv2d(64, 128, 2, 2)), nn.ReLU(), Flatten(),
             init_(nn.Linear(128, 64)), nn.ReLU())
 
         self.actor = nn.Sequential(
