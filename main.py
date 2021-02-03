@@ -14,6 +14,7 @@ import sys
 import h5py
 sys.path.append('/home/niranth/Desktop/Work/USC_Task/USC_task')
 sys.path.append('/content/drive/MyDrive/reward_induced/USC_task')
+sys.path.append('/home/niranth/Desktop/projects/test')
 
 from a2c_ppo_acktr import algo, utils
 from a2c_ppo_acktr.algo import gail
