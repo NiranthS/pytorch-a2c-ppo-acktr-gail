@@ -25,6 +25,9 @@ from evaluation import evaluate
 import matplotlib.pyplot as plt
 
 
+
+
+
 def main():
     args = get_args()
 
@@ -55,7 +58,7 @@ def main():
     # import pdb; pdb.set_trace()
     my_model_state_dict = actor_critic.state_dict()
     count = 0
-    pretrained_weights = torch.load('net_main.pth')
+    pretrained_weights = torch.load('decoding_main_64.pth')
     # pretrained_weights['']
     # old_names = list(pretrained_weights.items())
     pretrained_weights_items = list(pretrained_weights.items())
@@ -76,7 +79,7 @@ def main():
         ka += 1
         # import pdb; pdb.set_trace()
         param.requires_grad = False
-        if ka == 16:
+        if ka == 14:
             break
     count = 0
     # import pdb; pdb.set_trace()
