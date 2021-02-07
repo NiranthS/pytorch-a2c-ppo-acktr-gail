@@ -64,17 +64,17 @@ def main():
     # pretrained_weights['']
 
     # old_names = list(pretrained_weights.items())
-    pretrained_weights_items = list(pretrained_weights.items())
-    for key,value in my_model_state_dict.items():
-        layer_name, weights = pretrained_weights_items[count]
-        my_model_state_dict[key] = weights
-        print(count)
-        print(layer_name)
-        count += 1
-        if layer_name == 'enc_dense.bias':
-            break
+    # pretrained_weights_items = list(pretrained_weights.items())
+    # for key,value in my_model_state_dict.items():
+    #     layer_name, weights = pretrained_weights_items[count]
+    #     my_model_state_dict[key] = weights
+    #     print(count)
+    #     print(layer_name)
+    #     count += 1
+    #     if layer_name == 'enc_dense.bias':
+    #         break
 
-    actor_critic.load_state_dict(my_model_state_dict)
+    # actor_critic.load_state_dict(my_model_state_dict)
 
     ka = 0
 
@@ -221,7 +221,7 @@ def main():
             torch.save([
                 actor_critic,
                 getattr(utils.get_vec_normalize(envs), 'ob_rms', None)
-            ], os.path.join(save_path, args.env_name + "_ft.pt"))
+            ], os.path.join(save_path, args.env_name + "_random.pt"))
 
         if j % args.log_interval == 0 and len(episode_rewards) > 1:
             total_num_steps = (j + 1) * args.num_processes * args.num_steps
@@ -238,14 +238,14 @@ def main():
             rewards_median.append(np.median(episode_rewards))
             val_loss.append(value_loss)
             act_loss.append(action_loss)
-            torch.save(rewards_mean, "./plot_data/"+args.env_name+"_avg_rewards_ft.pt")
-            torch.save(rewards_median, "./plot_data/"+args.env_name+"_median_rewards_ft.pt")
+            torch.save(rewards_mean, "./plot_data/"+args.env_name+"_avg_rewards_random.pt")
+            torch.save(rewards_median, "./plot_data/"+args.env_name+"_median_rewards_random.pt")
             # torch.save(val_loss, "./plot_data/"+args.env_name+"_val_loss_enc_weights.pt")
             # torch.save(act_loss, "./plot_data/"+args.env_name+"_act_loss_enc_weights.pt")
 
             plt.plot(rewards_mean)
             # print(plt_points2)
-            plt.savefig("./imgs/"+args.env_name+"avg_reward_ft.png")
+            plt.savefig("./imgs/"+args.env_name+"avg_reward_random.png")
             # plt.show(block = False)
 
 
