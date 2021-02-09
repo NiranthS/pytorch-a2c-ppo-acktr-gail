@@ -66,7 +66,7 @@ def main():
     # import pdb; pdb.set_trace()
     # my_model_state_dict = actor_critic.state_dict()
     # count = 0
-    pretrained_weights = torch.load('net_main_4rh_v1_64.pth' )
+    pretrained_weights = torch.load('net_main_4rh_v2_64.pth' )
     # pretrained_weights = torch.load(os.path.join(save_path, args.env_name + "_ft.pt"))
     # pretrained_weights['']
 
