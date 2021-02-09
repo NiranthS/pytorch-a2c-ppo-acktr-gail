@@ -25,7 +25,7 @@ from a2c_ppo_acktr.storage import RolloutStorage
 from evaluation import evaluate
 import matplotlib.pyplot as plt
 
-import hiddenlayer as hl
+# import hiddenlayer as hl
 
 
 
