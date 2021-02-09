@@ -64,8 +64,8 @@ def main():
     # graph.save('rnn_hiddenlayer2', format='png')
     # print(args.re)
     # import pdb; pdb.set_trace()
-    # my_model_state_dict = actor_critic.state_dict()
-    # count = 0
+    my_model_state_dict = actor_critic.state_dict()
+    count = 0
     pretrained_weights = torch.load('net_main_4rh_v2_64.pth' )
     # pretrained_weights = torch.load(os.path.join(save_path, args.env_name + "_ft.pt"))
     # pretrained_weights['']
@@ -81,7 +81,7 @@ def main():
         if layer_name == 'enc_dense.bias':
             break
     # pretrained_weights = torch.load(os.path.join(save_path, args.env_name + "_random.pt"))[1]
-    actor_critic.load_state_dict(pretrained_weights)
+    actor_critic.load_state_dict(my_model_state_dict)
     start_epoch = 0
     ka = 0
 

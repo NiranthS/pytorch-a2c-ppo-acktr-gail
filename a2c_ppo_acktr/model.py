@@ -228,7 +228,7 @@ class CNNBase(NNBase):
         self.train()
 
     def forward(self, inputs, rnn_hxs = 1.0, masks = 1.0):
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         x = self.enc(torch.unsqueeze(inputs,1))
         # x =  (F.relu(self.conv1(torch.unsqueeze(inputs,1))))
         # x =  (F.relu(self.conv2(x)))
