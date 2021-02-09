@@ -73,9 +73,9 @@ def main():
     #     count += 1
     #     if layer_name == 'enc_dense.bias':
     #         break
-    pretrained_weights = torch.load(os.path.join(save_path, args.env_name + "_random.pt"))[1]
-    actor_critic.load_state_dict(pretrained_weights)
-    start_epoch = 205
+    # pretrained_weights = torch.load(os.path.join(save_path, args.env_name + "_random.pt"))[1]
+    # actor_critic.load_state_dict(pretrained_weights)
+    start_epoch = 0
     ka = 0
 
     # for param in actor_critic.parameters():
