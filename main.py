@@ -39,12 +39,12 @@ def main():
         torch.backends.cudnn.benchmark = False
         torch.backends.cudnn.deterministic = True
 
-    log_dir = os.path.expanduser(args.log_dir)
+    log_dir = os.path.expanduser(args.log_dir)  
     eval_log_dir = log_dir + "_eval"
     utils.cleanup_log_dir(log_dir)
     utils.cleanup_log_dir(eval_log_dir)
     # import pdb; pdb.set_trace()
-
+    save_path = os.path.join(args.save_dir, args.algo)
     torch.set_num_threads(1)
     device = torch.device("cuda:0" if args.cuda else "cpu")
 
@@ -57,11 +57,11 @@ def main():
         base_kwargs={'recurrent': args.recurrent_policy})
     # print(args.re)
     # import pdb; pdb.set_trace()
-    my_model_state_dict = actor_critic.state_dict()
-    count = 0
-    # pretrained_weights = torch.load('decoding_main_64.pth', map_location=torch.device('cpu') )
-    pretrained_weights = torch.load('net_main_4rh_64.pth')
-    # pretrained_weights['']
+    # my_model_state_dict = actor_critic.state_dict()
+    # count = 0
+    # pretrained_weights = torch.load('/home/niranth/Desktop/Work/USC_Task/final/models/Sprites-v0-net_main_4rh_64.pth', map_location=torch.device('cpu') )
+    # # pretrained_weights = torch.load(os.path.join(save_path, args.env_name + "_ft.pt"))
+    # # pretrained_weights['']
 
     # old_names = list(pretrained_weights.items())
     # pretrained_weights_items = list(pretrained_weights.items())
@@ -73,9 +73,9 @@ def main():
     #     count += 1
     #     if layer_name == 'enc_dense.bias':
     #         break
-
-    # actor_critic.load_state_dict(my_model_state_dict)
-
+    pretrained_weights = torch.load(os.path.join(save_path, args.env_name + "_random.pt"))[1]
+    actor_critic.load_state_dict(pretrained_weights)
+    start_epoch = 205
     ka = 0
 
     # for param in actor_critic.parameters():
@@ -150,7 +150,7 @@ def main():
     act_loss = []
     num_updates = int(
         args.num_env_steps) // args.num_steps // args.num_processes
-    for j in range(num_updates):
+    for j in range(start_epoch, num_updates):
 
         if args.use_linear_lr_decay:
             # decrease learning rate linearly
@@ -219,7 +219,7 @@ def main():
                 pass
 
             torch.save([
-                actor_critic,
+                actor_critic,actor_critic.state_dict(),
                 getattr(utils.get_vec_normalize(envs), 'ob_rms', None)
             ], os.path.join(save_path, args.env_name + "_random.pt"))
 

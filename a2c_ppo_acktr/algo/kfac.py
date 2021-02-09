@@ -135,7 +135,7 @@ class KFACOptimizer(optim.Optimizer):
 
         self.Ts = Ts
         self.Tf = Tf
-
+        import pdb; pdb.set_trace()
         self.optim = optim.SGD(
             model.parameters(),
             lr=self.lr * (1 - self.momentum),

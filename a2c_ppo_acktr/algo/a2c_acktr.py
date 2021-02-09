@@ -23,9 +23,9 @@ class A2C_ACKTR():
         self.entropy_coef = entropy_coef
 
         self.max_grad_norm = max_grad_norm
-
+        # import pdb; pdb.set_trace()
         if acktr:
-            self.optimizer = KFACOptimizer(actor_critic)
+            self.optimizer = KFACOptimizer([actor_critic, actor_critic])
         else:
             self.optimizer = optim.RMSprop(
                 actor_critic.parameters(), lr, eps=eps, alpha=alpha)
