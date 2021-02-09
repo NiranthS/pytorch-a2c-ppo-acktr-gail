@@ -30,7 +30,7 @@ class PPO():
         self.use_clipped_value_loss = use_clipped_value_loss
         # import pdb; pdb.set_trace()
         # self.optimizer = optim.Adam(actor_critic.parameters(), lr=lr, eps=eps)
-        self.optimizer = optim.Adam([ {'params': actor_critic.base.actor.parameters()},{'params': actor_critic.base.critic.parameters()}, {'params': actor_critic.base.critic_linear.parameters()}, {'params': actor_critic.dist.parameters()}, {'params': actor_critic.base.enc.parameters(), 'lr': lr/10.0}], lr=lr, eps=eps)
+        self.optimizer = optim.Adam([ {'params': actor_critic.base.actor.parameters()},{'params': actor_critic.base.critic.parameters()}, {'params': actor_critic.base.critic_linear.parameters()}, {'params': actor_critic.dist.parameters()}, {'params': actor_critic.base.enc.parameters(), 'lr': lr/100.0}], lr=lr, eps=eps)
 
     def update(self, rollouts):
         advantages = rollouts.returns[:-1] - rollouts.value_preds[:-1]

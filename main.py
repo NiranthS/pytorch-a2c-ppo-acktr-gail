@@ -25,6 +25,7 @@ from a2c_ppo_acktr.storage import RolloutStorage
 from evaluation import evaluate
 import matplotlib.pyplot as plt
 
+import hiddenlayer as hl
 
 
 
@@ -55,6 +56,12 @@ def main():
         envs.observation_space.shape,
         envs.action_space,
         base_kwargs={'recurrent': args.recurrent_policy})
+
+    # transforms = [ hl.transforms.Prune('Constant') ] # Removes Constant nodes from graph.
+
+    # graph = hl.build_graph(actor_critic, torch.zeros([1, 1, 64, 64]), transforms=transforms)
+    # graph.theme = hl.graph.THEMES['blue'].copy()
+    # graph.save('rnn_hiddenlayer2', format='png')
     # print(args.re)
     # import pdb; pdb.set_trace()
     # my_model_state_dict = actor_critic.state_dict()
@@ -221,7 +228,7 @@ def main():
             torch.save([
                 actor_critic,actor_critic.state_dict(),
                 getattr(utils.get_vec_normalize(envs), 'ob_rms', None)
-            ], os.path.join(save_path, args.env_name + "_random.pt"))
+            ], os.path.join(save_path, args.env_name + "_finetune.pt"))
 
         if j % args.log_interval == 0 and len(episode_rewards) > 1:
             total_num_steps = (j + 1) * args.num_processes * args.num_steps
@@ -238,14 +245,14 @@ def main():
             rewards_median.append(np.median(episode_rewards))
             val_loss.append(value_loss)
             act_loss.append(action_loss)
-            torch.save(rewards_mean, "./plot_data/"+args.env_name+"_avg_rewards_random.pt")
-            torch.save(rewards_median, "./plot_data/"+args.env_name+"_median_rewards_random.pt")
+            torch.save(rewards_mean, "./plot_data/"+args.env_name+"_avg_rewards_finetune.pt")
+            torch.save(rewards_median, "./plot_data/"+args.env_name+"_median_rewards_finetune.pt")
             # torch.save(val_loss, "./plot_data/"+args.env_name+"_val_loss_enc_weights.pt")
             # torch.save(act_loss, "./plot_data/"+args.env_name+"_act_loss_enc_weights.pt")
 
             plt.plot(rewards_mean)
             # print(plt_points2)
-            plt.savefig("./imgs/"+args.env_name+"avg_reward_random.png")
+            plt.savefig("./imgs/"+args.env_name+"avg_reward_finetune.png")
             # plt.show(block = False)
 
 
